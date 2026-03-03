@@ -10,8 +10,7 @@ public class ProdutoNaoPerecivel extends Produto {
 
     @Override
     public String gerarDadosTexto() {
-    /*Você deve implementar aqui a lógica que monta a String com os atributos do objeto ProdutoPerecivel,
-    respeitando o formato do arquivo de dados. */
+        return "1;" + super.gerarDadosTexto();
     }
-    
+
 }
