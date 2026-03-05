@@ -57,9 +57,25 @@ public class Comercio {
      * @param nomeArquivoDados Nome do arquivo de dados a ser aberto.
      * @return Um vetor com os produtos carregados, ou vazio em caso de problemas de leitura.
      */
-    static Produto[] lerProdutos(String nomeArquivoDados) {
+    static Produto[] lerProdutos(String nomeArquivoDados) throws FileNotFoundException {
+        File arquivo = new File(nomeArquivoDados);
         Produto[] vetorProdutos;
-        //TO DO
+
+        if (arquivo.exists()) {
+            Scanner leitor = new Scanner(arquivo);
+            int qtdArquivada = Integer.parseInt(leitor.nextLine());
+            vetorProdutos = new Produto[qtdArquivada + MAX_NOVOS_PRODUTOS];
+            for (int i = 0; i < qtdArquivada; i++) {
+                String linha = leitor.nextLine();
+                vetorProdutos[i] = Produto.criarDoTexto(linha);
+            }
+            quantosProdutos = qtdArquivada;
+            leitor.close();
+        } else {
+            System.out.println("Dados não encontrados");
+            vetorProdutos = new Produto[MAX_NOVOS_PRODUTOS];
+            quantosProdutos = 0;
+        }
         return vetorProdutos;
     }
 
@@ -76,7 +92,19 @@ public class Comercio {
     /** Localiza um produto no vetor de cadastrados, a partir do nome, e imprime seus dados. 
      *  A busca não é sensível ao caso.  Em caso de não encontrar o produto, imprime mensagem padrão */
     static void localizarProdutos(){
-        //TO DO
+        
+        System.out.print("Digite o nome (ou parte do nome) do produto para buscar: ");
+        String busca = teclado.nextLine().toLowerCase();
+        boolean encontrou = false;
+
+        for (int i = 0; i < quantosProdutos; i++) {
+            if (produtosCadastrados[i].toString().toLowerCase().contains(busca)) {
+                System.out.println("Encontrado: " + produtosCadastrados[i].toString());
+                encontrou = true;
+            }
+        }
+        if (!encontrou)
+            System.out.println("Nenhum produto encontrado com esse nome.");
     }
 
     /**
@@ -86,15 +114,53 @@ public class Comercio {
      * Uma sugestão de melhoria mais significativa poderia ser o uso de padrão Factory Method para criação dos objetos.
      */
     static void cadastrarProduto(){
-        //TO DO
+        
+        if (quantosProdutos >= produtosCadastrados.length) {
+            System.out.println("Capacidade máxima de produtos atingida.");
+            return;
+        }
+
+        System.out.println("Tipo de produto: (1) Não Perecível / (2) Perecível");
+        int tipo = Integer.parseInt(teclado.nextLine());
+
+        System.out.print("Descrição: ");
+        String desc = teclado.nextLine();
+
+        System.out.print("Preço de Custo: ");
+        double preco = Double.parseDouble(teclado.nextLine());
+
+        System.out.print("Margem de Lucro (ex: 0.2 para 20%): ");
+        double margem = Double.parseDouble(teclado.nextLine());
+
+        Produto novo = null;
+        if (tipo == 2) {
+            System.out.print("Data de Validade (dd/MM/yyyy): ");
+            String dataStr = teclado.nextLine();
+            LocalDate data = LocalDate.parse(dataStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            novo = new ProdutoPerecivel(desc, preco, margem, data);
+        } else {
+            novo = new ProdutoNaoPerecivel(desc, preco, margem);
+        }
+
+        produtosCadastrados[quantosProdutos] = novo;
+        quantosProdutos++;
+        System.out.println("Produto cadastrado com sucesso!");
     }
 
     /**
      * Salva os dados dos produtos cadastrados no arquivo csv informado. Sobrescreve todo o conteúdo do arquivo.
      * @param nomeArquivo Nome do arquivo a ser gravado.
      */
-    public static void salvarProdutos(String nomeArquivo){
-        //TO DO  
+    public static void salvarProdutos(String nomeArquivo) throws IOException {
+        FileWriter escritor = new FileWriter(nomeArquivo);
+        escritor.write(quantosProdutos + "\n");
+        for (int i = 0; i < quantosProdutos; i++) {
+            if (produtosCadastrados[i] != null) {
+                escritor.write(produtosCadastrados[i].gerarDadosTexto() + "\n");
+            }
+        }
+        escritor.close();
+        System.out.println("Dados salvos com sucesso em " + nomeArquivo);
     }
 
     public static void main(String[] args) throws Exception {
