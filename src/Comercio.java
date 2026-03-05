@@ -132,14 +132,17 @@ public class Comercio {
         System.out.print("Margem de Lucro (ex: 0.2 para 20%): ");
         double margem = Double.parseDouble(teclado.nextLine());
 
+        System.out.print("Quantidade Em Estoque: ");
+        int estoque = Integer.parseInt(teclado.nextLine());
+
         Produto novo = null;
         if (tipo == 2) {
             System.out.print("Data de Validade (dd/MM/yyyy): ");
             String dataStr = teclado.nextLine();
             LocalDate data = LocalDate.parse(dataStr, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            novo = new ProdutoPerecivel(desc, preco, margem, data);
+            novo = new ProdutoPerecivel(desc, preco, margem, data, estoque);
         } else {
-            novo = new ProdutoNaoPerecivel(desc, preco, margem);
+            novo = new ProdutoNaoPerecivel(desc, preco, margem, estoque);
         }
 
         produtosCadastrados[quantosProdutos] = novo;
@@ -164,16 +167,17 @@ public class Comercio {
     }
 
     public static void main(String[] args) throws Exception {
-        teclado = new Scanner(System.in, Charset.forName("ISO-8859-2"));
+        teclado = new Scanner(System.in);
+        //System.in, Charset.forName("ISO-8859-2")
         nomeArquivoDados = "dadosProdutos.csv";
         produtosCadastrados = lerProdutos(nomeArquivoDados);
         int opcao = -1;
         do{
             opcao = menu();
             switch (opcao) {
-                case 1 -> listarTodosOsProdutos();
-                case 2 -> localizarProdutos();
-                case 3 -> cadastrarProduto();
+                case 1: listarTodosOsProdutos();
+                case 2: localizarProdutos();
+                case 3: cadastrarProduto();
             }
             pausa();
         }while(opcao !=0);       

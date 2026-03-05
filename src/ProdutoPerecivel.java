@@ -9,13 +9,13 @@ private int PRAZO_DESCONTO = 7;
 
 private LocalDate dataDeValidade;
 
-public ProdutoPerecivel(String desc, double precoCusto, double margemLucro, LocalDate dataDeValidade) {
-        super(desc, precoCusto, margemLucro);
+public ProdutoPerecivel(String desc, double precoCusto, double margemLucro, LocalDate dataDeValidade, int quantidadeEmEstoque) {
+        super(desc, precoCusto, margemLucro, quantidadeEmEstoque);
         this.dataDeValidade = dataDeValidade;
     }
 
-public ProdutoPerecivel(String desc, double precoCusto, LocalDate dataDeValidade) {
-        super(desc, precoCusto);
+public ProdutoPerecivel(String desc, double precoCusto, LocalDate dataDeValidade, int quantidadeEmEstoque) {
+        super(desc, precoCusto, quantidadeEmEstoque);
         this.dataDeValidade = dataDeValidade;
     }
 

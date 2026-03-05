@@ -8,6 +8,7 @@ public class Produto {
 	private String descricao;
 	private double precoCusto;
 	private double margemLucro;
+    public int quantidadeEmEstoque;
 	
 	/**
      * Inicializador privado. Os valores default, em caso de erro, são:
@@ -15,13 +16,15 @@ public class Produto {
      * @param desc Descrição do produto (mínimo de 3 caracteres)
      * @param precoCusto Preço do produto (mínimo 0.01)
      * @param margemLucro Margem de lucro (mínimo 0.01)
+     * @param quantidadeEmEstoque
      */
-	private void init(String desc, double precoCusto, double margemLucro) {
+	private void init(String desc, double precoCusto, double margemLucro, int quantidadeEmEstoque) {
 		
 		if ((desc.length() >= 3) && (precoCusto > 0.0) && (margemLucro > 0.0)) {
 			descricao = desc;
 			this.precoCusto = precoCusto;
 			this.margemLucro = margemLucro;
+            this.quantidadeEmEstoque = quantidadeEmEstoque;
 		} else {
 			throw new IllegalArgumentException("Valores inválidos para os dados do produto.");
 		}
@@ -34,8 +37,8 @@ public class Produto {
      * @param precoCusto Preço do produto (mínimo 0.01)
      * @param margemLucro Margem de lucro (mínimo 0.01)
      */
-	public Produto(String desc, double precoCusto, double margemLucro) {
-		init(desc, precoCusto, margemLucro);
+	public Produto(String desc, double precoCusto, double margemLucro, int quantidadeEmEstoque) {
+		init(desc, precoCusto, margemLucro, quantidadeEmEstoque);
 	}
 	
 	/**
@@ -45,8 +48,8 @@ public class Produto {
      * @param desc Descrição do produto (mínimo de 3 caracteres)
      * @param precoCusto Preço do produto (mínimo 0.01)
      */
-	public Produto(String desc, double precoCusto) {
-		init(desc, precoCusto, MARGEM_PADRAO);
+	public Produto(String desc, double precoCusto, int quantidadeEmEstoque) {
+		init(desc, precoCusto, MARGEM_PADRAO, quantidadeEmEstoque);
 	}
 	
 	 /**
@@ -67,7 +70,7 @@ public class Produto {
     	
     	NumberFormat moeda = NumberFormat.getCurrencyInstance();
     	
-		return String.format("NOME: " + descricao + ": " + moeda.format(valorDeVenda()));
+		return String.format("NOME: " + descricao + ": " + moeda.format(valorDeVenda()) + " // " + "QUANTIDADE EM ESTOQUE: " + quantidadeEmEstoque);
 	}
 
 	/**
@@ -83,17 +86,19 @@ public class Produto {
 
 	static Produto criarDoTexto(String linha) {
     Produto novoProduto = null;
-    var formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     String[] atributos = linha.split(";");
     int tipo = Integer.parseInt(atributos[0]);
     String descricao = atributos[1];
     double precoCusto = Double.parseDouble(atributos[2]);
     double margemLucro = Double.parseDouble(atributos[3]);
     if (tipo == 1) {
-        novoProduto = new ProdutoNaoPerecivel(descricao, precoCusto, margemLucro);
+        int quantidadeEmEstoque = Integer.parseInt(atributos[4]);
+        novoProduto = new ProdutoNaoPerecivel(descricao, precoCusto, margemLucro, quantidadeEmEstoque);
     } else {
         LocalDate dataDeValidade = LocalDate.parse(atributos[4], formatoData);
-        novoProduto = new ProdutoPerecivel(descricao, precoCusto, margemLucro, dataDeValidade);
+        int quantidadeEmEstoque = Integer.parseInt(atributos[5]);
+        novoProduto = new ProdutoPerecivel(descricao, precoCusto, margemLucro, dataDeValidade, quantidadeEmEstoque);
     }
 
     return novoProduto;
@@ -106,7 +111,7 @@ public class Produto {
      * descrição;preçoDeCusto;margemDeLucro;[dataDeValidade]"
      */
     public String gerarDadosTexto() {
-        return this.descricao + ";" + this.precoCusto + ";" + this.margemLucro + ";";
+        return this.descricao + ";" + this.precoCusto + ";" + this.margemLucro + this.quantidadeEmEstoque + ";";
     }
 
 }
